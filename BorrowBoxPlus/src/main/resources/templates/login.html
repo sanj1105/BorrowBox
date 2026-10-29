@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Sign in - BorrowBox</title>
+  <link rel="stylesheet" th:href="@{/css/style.css}">
+</head>
+<body class="auth-page">
+<main class="auth-card">
+  <a class="auth-brand" th:href="@{/login}">BorrowBox</a>
+  <p class="auth-kicker">COMMUNITY LENDING, MADE SIMPLE</p>
+  <h1>Welcome back</h1>
+  <p class="auth-intro">Sign in to discover items and share what you own.</p>
+  <div th:replace="~{fragments :: flash}"></div>
+  <form th:action="@{/login}" method="post" class="form auth-form">
+    <label for="email">Email address</label>
+    <input id="email" name="email" type="email" autocomplete="email" required autofocus>
+    <label for="password">Password</label>
+    <input id="password" name="password" type="password" autocomplete="current-password" required>
+    <button class="btn-primary auth-submit" type="submit">Sign in</button>
+  </form>
+  <p class="auth-switch">New to BorrowBox? <a th:href="@{/register}">Create an account</a></p>
+  <p class="auth-demo">Demo accounts: asha@example.com, ravi@example.com, meena@example.com<br>Shared demo password: <code>Borrowbox123!</code></p>
+</main>
+</body>
+</html>

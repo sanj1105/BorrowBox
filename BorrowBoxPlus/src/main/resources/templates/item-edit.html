@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Edit item - BorrowBox</title>
+  <link rel="stylesheet" th:href="@{/css/style.css}">
+</head>
+<footer th:replace="~{fragments :: footer}"></footer>
+<body>
+<header th:replace="~{fragments :: header}"></header>
+<main>
+  <h1>Edit item</h1>
+
+  <form th:action="@{/items/{id}/edit(id=${itemId})}" th:object="${itemForm}" method="post" class="form">
+    <label>Name
+      <input type="text" th:field="*{name}">
+      <span class="error" th:if="${#fields.hasErrors('name')}" th:errors="*{name}"></span>
+    </label>
+    <label>Description
+      <textarea th:field="*{description}" rows="3"></textarea>
+      <span class="error" th:if="${#fields.hasErrors('description')}" th:errors="*{description}"></span>
+    </label>
+    <label>Category
+      <input type="text" th:field="*{category}">
+      <span class="error" th:if="${#fields.hasErrors('category')}" th:errors="*{category}"></span>
+    </label>
+    <div class="actions">
+      <button type="submit">Save changes</button>
+      <a th:href="@{/items}" class="btn-link">Cancel</a>
+    </div>
+  </form>
+</main>
+</body>
+</html>

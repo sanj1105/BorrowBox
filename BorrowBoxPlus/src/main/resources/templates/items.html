@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Browse items - BorrowBox</title>
+  <link rel="stylesheet" th:href="@{/css/style.css}">
+</head>
+<body>
+<header th:replace="~{fragments :: header}"></header>
+<main>
+  <h1>Browse items</h1>
+  <div th:replace="~{fragments :: flash}"></div>
+  <section th:if="${loginAlerts != null and !loginAlerts.isEmpty()}" class="login-alerts" aria-live="polite">
+    <h2>BorrowBox updates</h2>
+    <ul>
+      <li th:each="alert : ${loginAlerts}" th:text="${alert}"></li>
+    </ul>
+    <a th:href="@{/requests}" class="btn-link">View requests</a>
+  </section>
+
+  <form method="get" th:action="@{/items}" class="filters">
+    <input type="text" name="q" th:value="${q}" placeholder="Search by name">
+    <select name="category">
+      <option value="">All categories</option>
+      <option th:each="c : ${categories}" th:value="${c}" th:text="${c}"
+              th:selected="${c == selectedCategory}"></option>
+    </select>
+    <label><input type="checkbox" name="availableOnly" value="true" th:checked="${availableOnly}"> Available only</label>
+    <button type="submit">Search</button>
+  </form>
+
+  <p th:if="${items.isEmpty()}" class="empty">No items match your search.</p>
+
+  <div class="grid">
+    <div class="card" th:each="item : ${items}">
+      <div class="card-icon" th:with="cat=${#strings.toLowerCase(item.category)}"
+           th:text="${#strings.contains(cat,'book') ? '📚' : (#strings.contains(cat,'station') ? '✏️' : (#strings.contains(cat,'lab') ? '🔬' : (#strings.contains(cat,'electr') ? '💻' : '📦')))}">📦</div>
+      <h3 th:text="${item.name}">Name</h3>
+      <p th:text="${item.description}">Description</p>
+      <p class="meta">
+        <span class="tag" th:text="${item.category}">Category</span>
+        Owner: <strong th:text="${item.owner.name}">Owner</strong>
+      </p>
+      <span th:if="${item.available}" class="badge ok">Available</span>
+      <span th:unless="${item.available}" class="badge off">Not available</span>
+
+      <div th:if="${currentUser != null and item.owner.id == currentUser.id}" class="owner-actions">
+        <a th:href="@{/items/{id}/edit(id=${item.id})}" class="btn-link">Edit</a>
+        <form th:action="@{/items/{id}/availability(id=${item.id})}" method="post">
+          <input type="hidden" name="available" th:value="${!item.available}">
+          <button type="submit" class="secondary"
+                  th:text="${item.available ? 'Mark unavailable' : 'Mark available'}"></button>
+        </form>
+      </div>
+
+      <form th:if="${item.available and currentUser != null and item.owner.id != currentUser.id}"
+            th:action="@{/requests}" method="post" class="request-form">
+        <input type="hidden" name="itemId" th:value="${item.id}">
+        <label>From <input type="date" name="startDate" required></label>
+        <label>To <input type="date" name="endDate" required></label>
+        <button type="submit">Request to borrow</button>
+      </form>
+    </div>
+  </div>
+</main>
+<footer th:replace="~{fragments :: footer}"></footer>
+</body>
+</html>

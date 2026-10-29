@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<body>
+<header th:fragment="header" class="topbar">
+    <a th:href="@{/items}" class="brand">BorrowBox</a>
+    <nav>
+        <a th:href="@{/items}">Browse</a>
+        <a th:href="@{/items/new}">List an item</a>
+        <a th:href="@{/requests}">Requests</a>
+    </nav>
+    <div class="account-actions">
+        <a th:if="${currentUser == null}" th:href="@{/login}" class="account-icon"
+           aria-label="Sign in" title="Sign in">
+            <span aria-hidden="true">♙</span>
+        </a>
+        <th:block th:if="${currentUser != null}">
+            <span class="signed-in-label">Signed in as <strong th:text="${currentUser.name}">User</strong></span>
+            <form th:action="@{/logout}" method="post" class="logout-form">
+                <button type="submit" class="account-icon" aria-label="Log out" title="Log out">
+                    <span aria-hidden="true">⇥</span>
+                </button>
+            </form>
+        </th:block>
+    </div>
+</header>
+
+<div th:fragment="flash">
+    <p th:if="${error}" class="flash error-box" th:text="${error}"></p>
+    <p th:if="${success}" class="flash success-box" th:text="${success}"></p>
+</div>
+
+<footer th:fragment="footer" class="site-footer">
+    <strong>BorrowBox</strong> · Community lending platform
+</footer>
+</body>
+</html>

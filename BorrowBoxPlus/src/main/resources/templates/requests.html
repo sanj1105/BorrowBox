@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Requests - BorrowBox</title>
+  <link rel="stylesheet" th:href="@{/css/style.css}">
+</head>
+<body>
+<header th:replace="~{fragments :: header}"></header>
+<main>
+  <h1>Requests</h1>
+  <div th:replace="~{fragments :: flash}"></div>
+
+  <div class="stats">
+    <div class="stat stat-pending"><span class="stat-num" th:text="${pendingCount}">0</span><span class="stat-label">Pending</span></div>
+    <div class="stat stat-active"><span class="stat-num" th:text="${activeCount}">0</span><span class="stat-label">Active loans</span></div>
+    <div class="stat stat-overdue"><span class="stat-num" th:text="${overdueCount}">0</span><span class="stat-label">Overdue</span></div>
+    <div class="stat stat-returned"><span class="stat-num" th:text="${returnedCount}">0</span><span class="stat-label">Returned</span></div>
+  </div>
+
+  <h2>Requests for my items</h2>
+  <p th:if="${incoming.isEmpty()}" class="empty">Nobody has requested your items yet.</p>
+  <table th:unless="${incoming.isEmpty()}" class="table">
+    <thead>
+    <tr><th>Item</th><th>Borrower</th><th>From</th><th>To</th><th>Status</th><th>Action</th></tr>
+    </thead>
+    <tbody>
+    <tr th:each="r : ${incoming}"
+        th:classappend="${r.status.name() == 'ACTIVE' and r.endDate.isBefore(today)} ? 'overdue'">
+      <td th:text="${r.item.name}"></td>
+      <td th:text="${r.borrower.name}"></td>
+      <td th:text="${#temporals.format(r.startDate, 'dd/MM/yyyy')}"></td>
+      <td th:text="${#temporals.format(r.endDate, 'dd/MM/yyyy')}"></td>
+      <td>
+        <span class="badge" th:classappend="'s-' + ${r.status}" th:text="${r.status}"></span>
+        <span th:if="${r.status.name() == 'ACTIVE' and r.endDate.isBefore(today)}"
+              class="badge s-OVERDUE">Overdue</span>
+      </td>
+      <td>
+        <div class="actions" th:if="${r.status.name() == 'PENDING'}">
+          <form th:action="@{/requests/{id}/approve(id=${r.id})}" method="post"><button>Approve</button></form>
+          <form th:action="@{/requests/{id}/reject(id=${r.id})}" method="post"><button class="secondary">Reject</button></form>
+        </div>
+        <form th:if="${r.status.name() == 'APPROVED'}" th:action="@{/requests/{id}/handover(id=${r.id})}" method="post">
+          <button>Mark handed over</button>
+        </form>
+        <form th:if="${r.status.name() == 'ACTIVE'}" th:action="@{/requests/{id}/return(id=${r.id})}" method="post">
+          <button>Mark returned</button>
+        </form>
+      </td>
+    </tr>
+    </tbody>
+  </table>
+
+  <h2>My borrow requests</h2>
+  <p th:if="${myRequests.isEmpty()}" class="empty">You haven't requested anything yet.</p>
+  <table th:unless="${myRequests.isEmpty()}" class="table">
+    <thead>
+    <tr><th>Item</th><th>Owner</th><th>From</th><th>To</th><th>Status</th></tr>
+    </thead>
+    <tbody>
+    <tr th:each="r : ${myRequests}"
+        th:classappend="${r.status.name() == 'ACTIVE' and r.endDate.isBefore(today)} ? 'overdue'">
+      <td th:text="${r.item.name}"></td>
+      <td th:text="${r.item.owner.name}"></td>
+      <td th:text="${#temporals.format(r.startDate, 'dd/MM/yyyy')}"></td>
+      <td th:text="${#temporals.format(r.endDate, 'dd/MM/yyyy')}"></td>
+      <td>
+        <span class="badge" th:classappend="'s-' + ${r.status}" th:text="${r.status}"></span>
+        <span th:if="${r.status.name() == 'ACTIVE' and r.endDate.isBefore(today)}"
+              class="badge s-OVERDUE">Overdue</span>
+      </td>
+    </tr>
+    </tbody>
+  </table>
+</main>
+<footer th:replace="~{fragments :: footer}"></footer>
+</body>
+</html>
